@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Profesjonalny bank, który dba o Twoje finanse.">
+    <title>Bank Przykład - Twoje finanse w dobrych rękach</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Pasek nawigacyjny -->
+    <div class="navbar">
+        <div class="logo">
+            <a href="bank.html">
+                <img src="logo2.png" alt="BankSystem" style="height: 50px;">
+            </a>
+        </div>
+        <div class="navbar-right">
+            <button class="btn btn-light"><a href="login.html">Logowanie</a></button>
+            <button class="btn btn-light"><a href="register.php">Rejestracja</a></button>
+        </div>
+    </div>
+
+    <section id="oNas" class="py-5 bg-light">
+        <div class="container">
+            <div class="row text-center">
+                <h2>O nas</h2>
+                <p>Jesteśmy wiodącym bankiem, który oferuje nowoczesne rozwiązania finansowe. Zaufaj nam, a my pomożemy Ci osiągnąć Twoje cele finansowe.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="kontakt" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center fw-bold">Kontakt</h2>
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <h5 class="fw-bold">Adres</h5>
+                    <p>ul. Przykładowa 1, 00-001 Warszawa</p>
+                    <h5 class="fw-bold">Telefon</h5>
+                    <p>+48 123 456 789</p>
+                    <h5 class="fw-bold">Email</h5>
+                    <p><a href="mailto:kontakt@bankprzyklad.pl">kontakt@bankprzyklad.pl</a></p>
+                </div>
+                <div class="col-md-6">
+                    <form>
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Imię i nazwisko</label>
+                            <input type="text" class="form-control" id="name" placeholder="Wpisz swoje imię" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" placeholder="Wpisz swój email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Wiadomość</label>
+                            <textarea class="form-control" id="message" placeholder="Napisz swoją wiadomość" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Wyślij</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stopka -->
+    <footer class="bg-dark text-white text-center py-3 mt-5">
+        <div class="container">
+            <p>&copy; Wszystkie prawa zastrzeżone.</p>
+        </div>
+    </footer>
+</body>
+</html>

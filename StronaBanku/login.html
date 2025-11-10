@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logowanie</title>
+    <link rel="stylesheet" href="style.css"> <!-- Link do wspólnego pliku CSS -->
+    <script>
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const error = urlParams.get('error');
+            if (error === 'wrong-password') {
+                alert('Nieprawidłowe hasło!');
+            } else if (error === 'user-not-found') {
+                alert('Użytkownik o podanej nazwie nie istnieje!');
+            } else if (error === 'account-blocked') {
+                alert('Twoje konto jest zablokowane! Skontaktuj się z administratorem.');
+            }
+        }
+    </script>
+</head>
+<body>
+
+
+        <!-- Pasek nawigacyjny -->
+        <div class="navbar">
+            <div class="logo">
+                <a href="bank.html">
+                    <img src="logo2.png" alt="BankSystem" style="height: 50px;">
+                </a>
+            </div>
+            <div class="navbar-right">
+                <button><a href="login.html">Logowanie</a></button>
+                <button><a href="register.php">Rejestracja</a></button>
+            </div>
+        </div>
+
+        <!-- Nagłówek -->
+        <div class="header">
+            Zaloguj się do swojego konta
+        </div>
+
+        <!-- Formularz logowania -->
+        <div class="login-form">
+            <form action="login.php" method="POST">
+                <label for="nazwa_uzytkownika">Nazwa użytkownika</label>
+                <input type="text" id="nazwa_uzytkownika" name="nazwa_uzytkownika" required>
+
+                <label for="haslo">Hasło</label>
+                <input type="password" id="haslo" name="haslo" required>
+<br>
+                <button type="submit">Zaloguj się</button>
+            </form>
+            <br>
+            <p>Zapomniałeś hasła? <a href="przypomnij_haslo.php">Przypomnij hasło</a></p>
+        </div>
+
+
+    <!-- Stopka -->
+    <footer>
+        <div class="container">
+            <p>&copy; Wszystkie prawa zastrzeżone.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
