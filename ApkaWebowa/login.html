@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logowanie</title>
+
+    <!-- Poprawna ścieżka -->
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .twofa-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #f5f5f5;
+            border: 1px solid #ccc;
+        }
+
+        .twofa-box h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .twofa-box input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="logo">
+            <a href="bank.html">
+                <img src="assets/logo2.png" alt="BankSystem" style="height: 50px;">
+            </a>
+        </div>
+        <div class="navbar-right">
+            <button><a href="login.html">Logowanie</a></button>
+            <button><a href="register.php">Rejestracja</a></button>
+        </div>
+    </div>
+
+    <div class="header">Zaloguj się do swojego konta</div>
+
+    <div class="login-form">
+
+        <!-- Formularz podstawowego logowania -->
+        <form id="login-form">
+            <label for="email">Adres e-mail</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="password">Hasło</label>
+            <input type="password" id="password" name="password" required>
+
+            <br><br>
+            <button type="submit">Zaloguj się</button>
+        </form>
+
+        <p id="error" style="color:red; margin-top: 10px;"></p>
+
+        <br>
+        <p>Zapomniałeś hasła? <a href="przypomnij_haslo.php">Przypomnij hasło</a></p>
+
+        <!-- Sekcja 2FA – pojawia się dopiero gdy backend tego zażąda -->
+        <div id="twofa-box" class="twofa-box" style="display: none;">
+            <h3>Weryfikacja 2FA</h3>
+            <p id="twofa-text">
+                Na Twoje konto skonfigurowano uwierzytelnianie dwuskładnikowe.
+                Wpisz kod 2FA, aby dokończyć logowanie.
+            </p>
+            <p id="twofa-debug" style="color:#555; font-size: 0.9em;"></p>
+
+            <label for="twofa-code">Kod 2FA:</label>
+            <input type="text" id="twofa-code" placeholder="Wpisz kod 2FA">
+
+            <button id="twofa-submit" type="button">Potwierdź kod</button>
+
+            <p id="twofa-error" style="color:red; margin-top: 8px;"></p>
+        </div>
+
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; Wszystkie prawa zastrzeżone.</p>
+        </div>
+    </footer>
+
+    <!-- NA PEWNO dobra ścieżka -->
+    <script src="js/apiClient.js"></script>
+
+    <script>
+        console.log("Login.js działa!");
+
+        const form       = document.getElementById("login-form");
+        const errorBox   = document.getElementById("error");
+
+        const twofaBox   = document.getElementById("twofa-box");
+        const twofaDebug = document.getElementById("twofa-debug");
+        const twofaCode  = document.getElementById("twofa-code");
+        const twofaBtn   = document.getElementById("twofa-submit");
+        const twofaError = document.getElementById("twofa-error");
+
+        // zapamiętujemy mail użytkownika, dla którego backend wymaga 2FA
+        let pendingTwofaEmail = null;
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            errorBox.textContent   = "";
+            twofaError.textContent = "";
+
+            const email    = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value;
+
+            console.log("Próba logowania...");
+
+            try {
+                const data = await ApiClient.login(email, password);
+
+                console.log("Odpowiedź API:", data);
+
+                // 1) Klasyczny login bez 2FA
+                if (data.access && data.refresh && !data.twofa_required) {
+                    ApiClient.saveTokens(data.access, data.refresh);
+                    window.location.href = "menu.php";
+                    return;
+                }
+
+                // 2) Backend mówi, że wymagane 2FA
+                if (data.twofa_required) {
+                    pendingTwofaEmail = email;
+
+                    twofaBox.style.display = "block";  // pokaż sekcję z kodem
+
+                    // wyświetl komunikat z backendu (jeśli jest)
+                    if (data.message) {
+                        errorBox.textContent = data.message;
+                    } else {
+                        errorBox.textContent = "Włączono 2FA – podaj kod, aby się zalogować.";
+                    }
+
+                    // na projekt – pokaż debug_code, żeby można było przepisać
+                    if (data.debug_code) {
+                        twofaDebug.textContent = "Kod 2FA (tylko na projekt / debug): " + data.debug_code;
+                    } else {
+                        twofaDebug.textContent = "";
+                    }
+
+                    return;
+                }
+
+                // 3) Jakieś inne info z backendu (np. błąd)
+                if (data.message) {
+                    errorBox.textContent = data.message;
+                } else {
+                    errorBox.textContent = "Błędny login lub hasło.";
+                }
+
+            } catch (err) {
+                console.error(err);
+                errorBox.textContent = err.message || "Błąd logowania.";
+            }
+        });
+
+        // Obsługa potwierdzania kodu 2FA
+        twofaBtn.addEventListener("click", async () => {
+            twofaError.textContent = "";
+
+            const code = twofaCode.value.trim();
+
+            if (!pendingTwofaEmail) {
+                twofaError.textContent = "Najpierw wykonaj logowanie, aby wygenerować kod 2FA.";
+                return;
+            }
+
+            if (!code) {
+                twofaError.textContent = "Wpisz kod 2FA.";
+                return;
+            }
+
+            try {
+                // Używamy tego samego API_BASE_URL, co w apiClient.js
+                const baseUrl = typeof API_BASE_URL !== "undefined"
+                    ? API_BASE_URL
+                    : "http://localhost/bank_api/api";
+
+                const resp = await fetch(baseUrl + "/auth_2fa_verify.php", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        email: pendingTwofaEmail,
+                        code: code
+                    })
+                });
+
+                let data = {};
+                try {
+                    data = await resp.json();
+                } catch (e) {
+                    data = {};
+                }
+
+                if (!resp.ok) {
+                    const msg = data.message || data.error || "Błąd weryfikacji 2FA";
+                    throw new Error(msg);
+                }
+
+                console.log("Odpowiedź z /auth_2fa_verify.php:", data);
+
+                if (data.access && data.refresh) {
+                    ApiClient.saveTokens(data.access, data.refresh);
+                    window.location.href = "menu.php";
+                    return;
+                }
+
+                twofaError.textContent = data.message || "Nie udało się zweryfikować kodu 2FA.";
+
+            } catch (err) {
+                console.error(err);
+                twofaError.textContent = err.message || "Błąd przy weryfikacji kodu 2FA.";
+            }
+        });
+    </script>
+
+</body>
+</html>
