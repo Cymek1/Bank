@@ -1,0 +1,133 @@
+version: "3.8"
+
+services:
+  rabbitmq:
+    image: rabbitmq:3.11-management
+    container_name: bank_rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672" # UI
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - backend
+
+  mysql:
+    image: mysql:8.0
+    container_name: bank_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: bank_db
+      MYSQL_USER: bank
+      MYSQL_PASSWORD: bankpass
+    ports:
+      - "3308:3306"
+    command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1"]
+      interval: 10s
+      retries: 10
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./db/migrations.sql:/docker-entrypoint-initdb.d/1-migrations.sql:ro
+    networks:
+      - backend
+
+  producer:
+    build:
+      context: .
+      dockerfile: ./producer/Dockerfile
+    container_name: bank_producer
+    restart: unless-stopped
+    environment:
+      RABBIT_URL: amqp://guest:guest@rabbitmq:5672
+      QUEUE_NAME: bank_events
+      PORT: 4000
+      HTTP_FALLBACK_URL: http://consumer:4001/api/receive
+      COMM_MODE: ${COMM_MODE:-rabbit}
+    depends_on:
+      - rabbitmq
+      - consumer
+    ports:
+      - "4000:4000"
+    networks:
+      - backend
+    volumes:
+      - ./utils:/app/utils
+
+  consumer:
+    build:
+      context: .
+      dockerfile: ./consumer/Dockerfile
+    container_name: bank_consumer
+    restart: unless-stopped
+    environment:
+      RABBIT_URL: amqp://guest:guest@rabbitmq:5672
+      QUEUE_NAME: bank_events
+      PORT: 4001
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: bank
+      MYSQL_PASSWORD: bankpass
+      MYSQL_DB: bank_db
+    depends_on:
+      - rabbitmq
+      - mysql
+    ports:
+      - "4001:4001"
+    networks:
+      - backend
+    volumes:
+      - ./utils:/app/utils
+      - ./db:/app/db
+
+  php:
+    build:
+      context: ./php
+      dockerfile: ./Dockerfile
+    container_name: bank_php
+    restart: unless-stopped
+    environment:
+      PRODUCER_URL: http://producer:4000
+      DB_HOST: mysql
+      DB_NAME: bank_db
+      DB_USER: bank
+      DB_PASS: bankpass
+    depends_on:
+      - producer
+      - mysql
+    ports:
+      - "8000:80"
+    networks:
+      - backend
+    volumes:
+      - ../api:/var/www/html:ro
+
+  php_worker:
+    build:
+      context: ./php
+      dockerfile: ./Dockerfile
+    container_name: bank_php_worker
+    restart: unless-stopped
+    environment:
+      PRODUCER_URL: http://producer:4000
+      DB_HOST: mysql
+      DB_NAME: bank_db
+      DB_USER: bank
+      DB_PASS: bankpass
+    depends_on:
+      - producer
+      - mysql
+    networks:
+      - backend
+    volumes:
+      - ../api:/var/www/html:ro
+    command: ["php", "/var/www/html/worker/flush_event_queue.php"]
+
+networks:
+  backend:
+
+volumes:
+  mysql_data:
