@@ -1,0 +1,9 @@
+{
+  "steps": [
+    {
+      "step": "register",
+      "email": "e2e_1764092572166@example.test"
+    }
+  ],
+  "error": "Request failed with status code 404"
+}

@@ -1,0 +1,23 @@
+{
+  "test": "invalid_payload",
+  "attempts": [
+    {
+      "status": 400,
+      "data": {
+        "error": "validation_failed",
+        "details": [
+          {
+            "instancePath": "",
+            "schemaPath": "#/required",
+            "keyword": "required",
+            "params": {
+              "missingProperty": "id"
+            },
+            "message": "must have required property 'id'"
+          }
+        ]
+      }
+    }
+  ],
+  "result": "expected_failure"
+}

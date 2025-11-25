@@ -1,0 +1,31 @@
+{
+  "id": "test-1764096865908",
+  "producer": "http://localhost:4000",
+  "consumer": "http://localhost:4001",
+  "attempts": [
+    {
+      "stage": "send",
+      "status": 200,
+      "data": {
+        "status": "queued"
+      }
+    },
+    {
+      "stage": "fetch",
+      "error": "Request failed with status code 404"
+    },
+    {
+      "stage": "fetch",
+      "status": 200,
+      "account": {
+        "id": "test-1764096865908",
+        "balance": "123.45",
+        "metadata": {
+          "source": "integration"
+        },
+        "updated_at": "2025-11-25T18:54:26.000Z"
+      }
+    }
+  ],
+  "success": true
+}

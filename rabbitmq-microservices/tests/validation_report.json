@@ -1,0 +1,10 @@
+{
+  "checked": [
+    "report.json",
+    "php_integration_report.json",
+    "negative_invalid_payload_report.json",
+    "failure_rabbit_outage_report.json",
+    "failure_mysql_outage_report.json"
+  ],
+  "errors": []
+}

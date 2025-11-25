@@ -1,0 +1,100 @@
+{
+  "test": "failure_rabbit_outage",
+  "steps": [
+    {
+      "action": "stop_rabbit"
+    },
+    {
+      "action": "register",
+      "email": "fail_rabbit_1764092574766@example.test"
+    },
+    {
+      "register_response": {
+        "status": "OK",
+        "message": "Konto utworzone poprawnie",
+        "user_id": 22,
+        "nr_konta": "6614"
+      }
+    },
+    {
+      "action": "start_rabbit"
+    },
+    {
+      "poll_error": "Request failed with status code 404"
+    },
+    {
+      "poll_error": "Request failed with status code 404"
+    },
+    {
+      "poll_error": "Request failed with status code 404"
+    },
+    {
+      "poll_error": "Request failed with status code 404"
+    },
+    {
+      "poll_error": "Request failed with status code 404"
+    },
+    {
+      "poll_error": "Request failed with status code 404"
+    },
+    {
+      "poll_error": "Request failed with status code 404"
+    },
+    {
+      "poll_error": "Request failed with status code 404"
+    },
+    {
+      "poll_error": "Request failed with status code 404"
+    },
+    {
+      "poll_error": "Request failed with status code 404"
+    },
+    {
+      "poll_error": "Request failed with status code 404"
+    },
+    {
+      "poll_error": "Request failed with status code 404"
+    },
+    {
+      "poll_error": "Request failed with status code 404"
+    },
+    {
+      "poll_error": "Request failed with status code 404"
+    },
+    {
+      "poll_error": "Request failed with status code 404"
+    },
+    {
+      "poll_error": "Request failed with status code 404"
+    },
+    {
+      "poll_error": "Request failed with status code 404"
+    },
+    {
+      "poll_error": "Request failed with status code 404"
+    },
+    {
+      "poll_error": "Request failed with status code 404"
+    },
+    {
+      "poll_error": "Request failed with status code 404"
+    },
+    {
+      "poll_error": "Request failed with status code 404"
+    },
+    {
+      "poll_error": "Request failed with status code 404"
+    },
+    {
+      "consumer_found": {
+        "id": "22",
+        "balance": "0.00",
+        "metadata": {
+          "type": "register"
+        },
+        "updated_at": "2025-11-25T17:42:55.000Z"
+      }
+    }
+  ],
+  "success": true
+}

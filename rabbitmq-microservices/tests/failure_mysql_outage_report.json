@@ -1,0 +1,36 @@
+{
+  "test": "failure_mysql_outage",
+  "steps": [
+    {
+      "action": "stop_mysql"
+    },
+    {
+      "send_response": {
+        "status": "queued"
+      }
+    },
+    {
+      "action": "start_mysql"
+    },
+    {
+      "poll_error": "Request failed with status code 500"
+    },
+    {
+      "poll_error": "Request failed with status code 500"
+    },
+    {
+      "poll_error": "Request failed with status code 500"
+    },
+    {
+      "found": {
+        "id": "mysql_outage_1764092610055",
+        "balance": "42.00",
+        "metadata": {
+          "test": "mysql_outage"
+        },
+        "updated_at": "2025-11-25T17:43:30.000Z"
+      }
+    }
+  ],
+  "success": true
+}
